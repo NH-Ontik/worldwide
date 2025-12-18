@@ -33,7 +33,8 @@
 
 <div class="container">
     <h2>BUP Final Grade Predictor</h2>
-    <h3>Contributed by NH Ontik & Team</h3>
+
+    <h2>Contributed by NH Ontik & Team</h2>
     <!-- Class Tests -->
     <div class="input-group">
         <label>Class Tests (Marks Obtained)</label>
