@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUP Grade & Target Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h2 { text-align: center; color: #006a4e; margin-bottom: 20px; } /* BUP Greenish color */
+        
+        .input-group { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .input-row { display: flex; gap: 10px; }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        
+        .ct-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+        
+        button { width: 100%; padding: 15px; background-color: #006a4e; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        button:hover { background-color: #004d38; }
+        
+        #result-area { margin-top: 30px; display: none; }
+        .summary-box { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #006a4e; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .impossible { color: #d9534f; font-weight: bold; }
+        .achieved { color: #006a4e; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>BUP Final Grade Predictor</h2>
+
+    <!-- Class Tests -->
+    <div class="input-group">
+        <label>Class Tests (Marks Obtained)</label>
+        <div class="ct-inputs">
+            <input type="number" id="ct1" placeholder="CT 1">
+            <input type="number" id="ct2" placeholder="CT 2">
+            <input type="number" id="ct3" placeholder="CT 3">
+            <input type="number" id="ct4" placeholder="CT 4">
+        </div>
+        <div style="margin-top:10px;">
+            <label style="font-size: 0.9em; color: #666;">What are CTs marked out of?</label>
+            <input type="number" id="ctMax" value="20" placeholder="e.g., 20">
+        </div>
+    </div>
+
+    <!-- Other Assessments -->
+    <div class="input-group">
+        <label>Attendance (Out of 10)</label>
+        <input type="number" id="attendance" placeholder="e.g., 9.5">
+    </div>
+
+    <div class="input-group">
+        <label>Mid Term (Out of 20)</label>
+        <input type="number" id="midterm" placeholder="e.g., 18">
+    </div>
+
+    <div class="input-group">
+        <label>Assignment (Out of 10)</label>
+        <input type="number" id="assignment" placeholder="e.g., 9">
+    </div>
+
+    <div class="input-group">
+        <label>Project Paper (Out of 10)</label>
+        <input type="number" id="project" placeholder="e.g., 8.5">
+    </div>
+
+    <button onclick="calculateGrades()">Calculate Final Needs</button>
+
+    <!-- Results -->
+    <div id="result-area">
+        <div class="summary-box">
+            <strong>Current Status (Out of 60%):</strong> <span id="currentScore">0</span> / 60<br>
+            <small>Best 3 CT Avg (10%) + Att (10%) + Mid (20%) + Assgn (10%) + Proj (10%)</small>
+        </div>
+
+        <h3>Marks Needed in Final Exam (100 Marks Test)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Target Grade</th>
+                    <th>Target (4.0 Scale)</th>
+                    <th>Score Needed (Out of 100)</th>
+                </tr>
+            </thead>
+            <tbody id="gradeTable">
+                <!-- Rows will be added here by JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function calculateGrades() {
+        // 1. Get CT Values
+        let ct1 = parseFloat(document.getElementById('ct1').value) || 0;
+        let ct2 = parseFloat(document.getElementById('ct2').value) || 0;
+        let ct3 = parseFloat(document.getElementById('ct3').value) || 0;
+        let ct4 = parseFloat(document.getElementById('ct4').value) || 0;
+        let ctMax = parseFloat(document.getElementById('ctMax').value) || 20;
+
+        // CT Logic: Top 3, Average, Convert to 10%
+        let cts = [ct1, ct2, ct3, ct4];
+        cts.sort((a, b) => b - a); // Sort descending
+        let best3Sum = cts[0] + cts[1] + cts[2];
+        let averageRaw = best3Sum / 3;
+        
+        // Convert average to 10 marks
+        let ctFinal = (averageRaw / ctMax) * 10;
+
+        // 2. Get Other Values
+        let att = parseFloat(document.getElementById('attendance').value) || 0;
+        let mid = parseFloat(document.getElementById('midterm').value) || 0;
+        let ass = parseFloat(document.getElementById('assignment').value) || 0;
+        let proj = parseFloat(document.getElementById('project').value) || 0;
+
+        // 3. Calculate Pre-Final Total (Out of 60)
+        let preFinalTotal = ctFinal + att + mid + ass + proj;
+
+        // Display Current Score
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('currentScore').innerText = preFinalTotal.toFixed(2);
+
+        // 4. Generate Table for BUP Grading Scale
+        const grades = [
+            { name: "A+", points: 4.00, minTotal: 80 },
+            { name: "A",  points: 3.75, minTotal: 75 },
+            { name: "A-", points: 3.50, minTotal: 70 },
+            { name: "B+", points: 3.25, minTotal: 65 },
+            { name: "B",  points: 3.00, minTotal: 60 },
+            { name: "B-", points: 2.75, minTotal: 55 },
+            { name: "C+", points: 2.50, minTotal: 50 },
+            { name: "C",  points: 2.25, minTotal: 45 },
+            { name: "D",  points: 2.00, minTotal: 40 }
+        ];
+
+        let tableHtml = "";
+
+        grades.forEach(grade => {
+            // How many marks do we still need to reach the total?
+            let marksNeededForTotal = grade.minTotal - preFinalTotal;
+            
+            // The Final is worth 40% of the total grade.
+            // But the test is actually out of 100.
+            // Formula: (MarksNeeded / 40) * 100
+            
+            let finalExamScoreNeeded = (marksNeededForTotal / 40) * 100;
+
+            let status = "";
+            
+            if (marksNeededForTotal <= 0) {
+                status = "<span class='achieved'>Already Achieved</span>";
+            } else if (finalExamScoreNeeded > 100) {
+                status = "<span class='impossible'>Impossible (>100)</span>";
+            } else {
+                status = `Need <b>${Math.ceil(finalExamScoreNeeded)}</b> / 100`;
+            }
+
+            tableHtml += `
+                <tr>
+                    <td>${grade.name}</td>
+                    <td>${grade.points.toFixed(2)}</td>
+                    <td>${status}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('gradeTable').innerHTML = tableHtml;
+    }
+</script>
+
+</body>
+</html>
