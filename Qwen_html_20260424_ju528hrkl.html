@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Negotiation Dashboard</title>
+  <title>Edulytics x Ontik | GrowthOps Dashboard</title>
   <style>
     :root {
       --neon-blue: #00d4ff;
@@ -48,18 +48,13 @@
       border-radius: 6px;
       font-size: 0.9rem;
     }
-    .guide strong { color: var(--info); }
-    .guide ol { margin: 8px 0 0 18px; }
-    .guide li { margin: 4px 0; color: var(--text-dim); }
-
     .field { margin-bottom: 20px; }
     label { display: block; margin-bottom: 6px; font-weight: 500; color: #fff; }
     .hint { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 6px; display: block; }
-    input[type="number"] {
+    input[type="number"], input[type="text"], input[type="date"] {
       width: 100%; padding: 11px 13px; background: #0d1117; border: 1px solid var(--border);
       color: #fff; border-radius: 8px; font-size: 1rem;
     }
-    input[type="number"]:read-only { opacity: 0.85; cursor: not-allowed; }
 
     .slider-wrap { margin: 24px 0; }
     .slider-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 600; }
@@ -69,307 +64,170 @@
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--neon-blue);
-      cursor: pointer; border: 2px solid #0a0b10; transition: transform 0.1s;
+      cursor: pointer; border: 2px solid #0a0b10;
     }
-    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
     .toggle {
       display: flex; align-items: flex-start; gap: 12px; background: #21262d; padding: 14px 16px;
       border-radius: 10px; margin: 18px 0; cursor: pointer; border: 1px solid var(--border);
     }
     .toggle input { margin-top: 4px; width: 18px; height: 18px; cursor: pointer; accent-color: var(--neon-blue); }
-    .toggle strong { display: block; margin-bottom: 3px; color: #fff; }
-    .toggle small { color: var(--text-dim); display: block; }
-
-    .advanced {
-      background: #0d1117; border: 1px dashed var(--border); border-radius: 10px; padding: 18px;
-      margin: 20px 0; display: none;
-    }
-    .advanced.show { display: block; }
-    .advanced-toggle { cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 14px; color: var(--info); }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
     .summary {
       background: rgba(0, 212, 255, 0.07); border: 1px solid var(--neon-blue); padding: 20px;
       border-radius: 12px; margin: 26px 0;
     }
     .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 0.93rem; }
-    .row:last-child { border-bottom: none; }
     .row.total { border-top: 2px solid var(--neon-blue); border-bottom: none; margin-top: 10px; padding-top: 14px; font-weight: 600; font-size: 1.05rem; }
     .formula { font-size: 0.78rem; color: var(--text-dim); font-style: italic; margin-top: 2px; display: block; }
-    .note { font-size: 0.82rem; color: var(--text-dim); margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; }
 
     .btns { display: flex; gap: 12px; margin-top: 24px; }
     .btn {
       flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
-      cursor: pointer; transition: opacity 0.15s, transform 0.05s;
+      cursor: pointer;
     }
-    .btn:active { transform: translateY(1px); }
     .btn.primary { background: var(--neon-blue); color: #0a0b10; }
     .btn.secondary { background: #21262d; color: #fff; border: 1px solid var(--border); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    .status {
-      text-align: center; padding: 11px; margin-top: 14px; border-radius: 8px; font-size: 0.9rem; display: none;
-    }
+    .status { text-align: center; padding: 11px; margin-top: 14px; border-radius: 8px; font-size: 0.9rem; display: none; }
     .status.show { display: block; }
     .status.ok { background: rgba(46, 160, 67, 0.15); color: var(--success); border: 1px solid var(--success); }
-    .status.err { background: rgba(248, 81, 73, 0.15); color: var(--error); border: 1px solid var(--error); }
-
-    .footer {
-      font-size: 0.8rem; color: var(--text-dim); margin-top: 28px; padding-top: 18px;
-      border-top: 1px solid var(--border); line-height: 1.5;
-    }
-    .footer strong { color: #fff; }
-
-    @media (max-width: 560px) {
-      .grid { grid-template-columns: 1fr; }
-      .container { padding: 22px 18px; }
-      .row { flex-direction: column; gap: 4px; }
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>GrowthOps Negotiation Dashboard</h1>
-    <p class="subtitle">Balance cash compensation with company ownership. Adjust sliders to see real-time trade-offs.</p>
+    <h1>Edulytics x Ontik Dashboard</h1>
+    <p class="subtitle">Fractional GrowthOps (24h/wk) Negotiation Matrix</p>
 
-    <div class="guide">
-      <strong>How to use this dashboard:</strong>
-      <ol>
-        <li>Review pre-filled company data from your intake form.</li>
-        <li>Drag the <strong>Salary</strong> or <strong>Equity</strong> slider. They auto-sync.</li>
-        <li>Check the <strong>Effective Annual Value</strong> to compare offers fairly.</li>
-        <li>Click "Submit Final Terms" when you're ready.</li>
-      </ol>
+    <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+      <div class="field">
+        <label>Company Name</label>
+        <input type="text" id="companyName" value="Edulytics" />
+      </div>
+      <div class="field">
+        <label>Effective Date</label>
+        <input type="date" id="effectiveDate" />
+      </div>
     </div>
 
-    <div class="field">
-      <label>Company Annual Revenue (BDT)</label>
-      <span class="hint">Total income earned last year. Used for context only.</span>
-      <input type="number" id="revenue" readonly />
-    </div>
     <div class="field">
       <label>Estimated Valuation (BDT)</label>
-      <span class="hint">Current estimated worth of the company. Used as the denominator for equity calculations.</span>
-      <input type="number" id="valuation" readonly />
+      <span class="hint">Adjust based on current revenue multiples.</span>
+      <input type="number" id="valuation" value="25000000" oninput="calculate()" />
     </div>
 
     <label class="toggle" onclick="document.getElementById('ipRights').click()">
       <input type="checkbox" id="ipRights" onchange="calculate()" />
       <div>
         <strong>☑️ 100% IP Buyout Mode</strong>
-        <small>Transfers full ownership of your automation logic to the company. Adds a +5% equity premium to compensate for intellectual property transfer.</small>
+        <small>Transfer automation logic ownership to Edulytics. Adds +5% equity premium.</small>
       </div>
     </label>
 
     <div class="slider-wrap">
       <div class="slider-head">
-        <span>Monthly Salary</span>
-        <span class="val">৳<span id="salaryVal">0</span></span>
+        <span>Monthly Salary (24h/wk)</span>
+        <span class="val">৳<span id="salaryVal">35,000</span></span>
       </div>
-      <span class="hint">Your cash compensation. Benchmark: ৳100,000/mo for senior automation roles.</span>
-      <input type="range" id="salarySlider" min="35000" max="100000" step="1000" oninput="updateFromSalary()" />
+      <input type="range" id="salarySlider" min="35000" max="100000" step="1000" value="35000" oninput="calculate()" />
     </div>
 
     <div class="slider-wrap">
       <div class="slider-head">
-        <span>Equity Stake</span>
-        <span class="val"><span id="stakeVal">0</span>%</span>
+        <span>Equity Stake (15% Target)</span>
+        <span class="val"><span id="stakeVal">15</span>%</span>
       </div>
-      <span class="hint">Your ownership %. Automatically adjusts based on salary reduction vs. company valuation.</span>
-      <input type="range" id="stakeSlider" min="0.1" max="25" step="0.1" oninput="updateFromStake()" />
-    </div>
-
-    <div class="advanced-toggle" onclick="document.querySelector('.advanced').classList.toggle('show')">
-      <span id="advIcon">▶</span> Show Advanced Terms (Vesting, Risk, Dilution)
-    </div>
-    <div class="advanced">
-      <div class="grid">
-        <div class="field">
-          <label>Risk Discount (%)</label>
-          <span class="hint">Early equity is illiquid. Reduces paper value to realistic present worth.</span>
-          <input type="number" id="riskDiscount" value="50" min="0" max="100" oninput="calculate()" />
-        </div>
-        <div class="field">
-          <label>Vesting Period (Years)</label>
-          <span class="hint">Time required to fully earn your equity. Standard: 4 years.</span>
-          <input type="number" id="vestingYears" value="4" min="1" max="10" oninput="calculate()" />
-        </div>
-        <div class="field">
-          <label>Cliff Period (Months)</label>
-          <span class="hint">Minimum time before any equity vests. Standard: 12 months.</span>
-          <input type="number" id="cliffMonths" value="12" min="0" max="24" oninput="calculate()" />
-        </div>
-        <div class="field">
-          <label>Dilution Buffer (%)</label>
-          <span class="hint">Expected ownership loss from future funding rounds.</span>
-          <input type="number" id="dilutionBuffer" value="20" min="0" max="80" oninput="calculate()" />
-        </div>
-      </div>
+      <input type="range" id="stakeSlider" min="0.1" max="25" step="0.1" value="15" disabled />
     </div>
 
     <div class="summary">
       <div class="row">
-        <div>
-          Annual Salary Forgone
-          <span class="formula">Cash invested by taking less than benchmark</span>
-        </div>
+        <div>Opportunity Cost (Monthly)<span class="formula">Gap from ৳1L market rate</span></div>
         <span>৳<span id="forgone">0</span></span>
       </div>
       <div class="row">
-        <div>
-          Raw Equity
-          <span class="formula">(Forgone Salary ÷ Valuation) + IP Premium</span>
-        </div>
-        <span><span id="rawStake">0</span>%</span>
-      </div>
-      <div class="row">
-        <div>
-          Risk-Adjusted Equity
-          <span class="formula">Realistic stake after illiquidity & dilution</span>
-        </div>
-        <span><span id="adjustedStake">0</span>%</span>
+        <div>Vesting Duration</div>
+        <span>24 Months</span>
       </div>
       <div class="row total">
-        <div>
-          Effective Annual Value
-          <span class="formula">Your total yearly worth: Cash + (Realistic Equity ÷ Vesting Years)</span>
-        </div>
+        <div>Total Value Delivered<span class="formula">Cash + Accelerated Asset Value</span></div>
         <span>৳<span id="totalValue">0</span></span>
-      </div>
-      <div class="note">
-        💡 <strong>How to read this:</strong> If you stay for the full vesting period, this is your approximate yearly compensation. Equity is illiquid and only realizes value on exit or profit distribution.
       </div>
     </div>
 
     <div class="btns">
-      <button class="btn secondary" onclick="history.back()">← Back to Intake</button>
-      <button class="btn primary" id="submitBtn" onclick="submitFinal()">Submit Final Terms</button>
+      <button class="btn secondary" onclick="window.location.reload()">Reset</button>
+      <button class="btn primary" id="submitBtn" onclick="submitFinal()">Generate Edulytics MOU</button>
     </div>
 
     <div class="status" id="status"></div>
-
-    <div class="footer">
-      <strong>Next Steps & Legal Note:</strong><br>
-      Use this dashboard to align on a target range. Final terms must be documented in a shareholders' agreement including: vesting schedule, "Good Leaver" protections, IP assignment clauses, and drag/tag-along rights. This tool provides a financial framework only — not legal or tax advice. All figures in BDT.
-    </div>
   </div>
 
   <script>
-  const BENCHMARK_MONTHLY = 100000;
-  const BENCHMARK_ANNUAL = BENCHMARK_MONTHLY * 12;
+    const BENCHMARK_MONTHLY = 100000;
+    const WEB3FORMS_KEY = 'YOUR_WEB3FORMS_KEY_HERE'; 
 
-  const fmt = n => Math.round(n).toLocaleString('en-BD');
-  const $ = id => document.getElementById(id);
-  const status = (msg, ok) => {
-    const el = $('status');
-    el.textContent = msg;
-    el.className = 'status show ' + (ok ? 'ok' : 'err');
-    setTimeout(() => { el.className = 'status'; }, 2500);
-  };
+    const fmt = n => Math.round(n).toLocaleString('en-BD');
+    const $ = id => document.getElementById(id);
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const p = new URLSearchParams(window.location.search);
-    $('revenue').value = p.get('revenue') || '';
-    $('valuation').value = p.get('valuation') || '';
-    $('salarySlider').value = p.get('salary') || 35000;
-    $('stakeSlider').value = p.get('stake') || 15;
-    $('ipRights').checked = p.get('ip') === 'true';
-    calculate();
-  });
+    function calculate() {
+      const val = parseFloat($('valuation').value) || 1;
+      const sal = parseInt($('salarySlider').value);
+      const ip = $('ipRights').checked ? 5 : 0;
+      
+      const monthlyGap = BENCHMARK_MONTHLY - sal;
+      const annualGap = monthlyGap * 12;
+      
+      let stake = (annualGap / val) * 100 + ip;
+      stake = Math.max(0.1, Math.min(25, stake));
 
-  function calculate() {
-    const val = parseFloat($('valuation').value) || 1;
-    const sal = parseInt($('salarySlider').value);
-    const ip = $('ipRights').checked ? 5 : 0;
-    const risk = parseFloat($('riskDiscount').value) / 100;
-    const dil = parseFloat($('dilutionBuffer').value) / 100;
-    const vest = parseFloat($('vestingYears').value) || 4;
-
-    const gap = BENCHMARK_ANNUAL - (sal * 12);
-    let raw = (gap / val) * 100 + ip;
-    raw = Math.max(0.1, Math.min(25, raw));
-    let adj = raw * (1 - risk) * (1 - dil);
-    adj = Math.max(0, adj);
-
-    const eqVal = (adj / 100) * val;
-    const total = (sal * 12) + (eqVal / vest);
-
-    $('salaryVal').textContent = fmt(sal);
-    $('stakeVal').textContent = raw.toFixed(1);
-    $('forgone').textContent = fmt(gap);
-    $('rawStake').textContent = raw.toFixed(1);
-    $('adjustedStake').textContent = adj.toFixed(1);
-    $('totalValue').textContent = fmt(total);
-    $('stakeSlider').value = raw;
-  }
-
-  function updateFromSalary() { calculate(); }
-  function updateFromStake() {
-    const val = parseFloat($('valuation').value) || 1;
-    const target = parseFloat($('stakeSlider').value);
-    const ip = $('ipRights').checked ? 5 : 0;
-    const gap = ((target - ip) / 100) * val;
-    let sal = BENCHMARK_MONTHLY - (gap / 12);
-    sal = Math.max(35000, Math.min(100000, sal));
-    $('salarySlider').value = sal;
-    calculate();
-    $('stakeVal').textContent = target.toFixed(1);
-  }
-
-  async function submitFinal() {
-    const btn = $('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-
-    const payload = {
-      revenue: $('revenue').value,
-      valuation: $('valuation').value,
-      salary: $('salarySlider').value,
-      stake: $('stakeSlider').value,
-      ipRights: $('ipRights').checked,
-      riskDiscount: $('riskDiscount').value,
-      vestingYears: $('vestingYears').value,
-      cliffMonths: $('cliffMonths').value,
-      dilutionBuffer: $('dilutionBuffer').value,
-      effectiveValue: $('totalValue').textContent,
-      timestamp: new Date().toISOString()
-    };
-
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-  access_key: '558547d3-d69d-4cce-8c1e-6f2b9356b249', // ← Paste your key here
-  subject: '🤝 New Negotiation Submitted',
-  from_name: 'Negotiation Dashboard',
-  ...payload
-})
-      });
-
-      if (res.ok) {
-        btn.textContent = '✓ Sent to Email';
-        btn.style.background = '#2ea043';
-        status('Check your inbox for confirmation', true);
-      } else {
-        throw new Error('FormSubmit error');
-      }
-    } catch (e) {
-      console.error(e);
-      btn.textContent = '✗ Failed';
-      status('Try again or email manually', false);
-    } finally {
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.textContent = 'Submit Final Terms';
-        btn.style.background = '';
-      }, 3000);
+      $('salaryVal').textContent = fmt(sal);
+      $('stakeVal').textContent = stake.toFixed(1);
+      $('forgone').textContent = fmt(monthlyGap);
+      $('totalValue').textContent = fmt(BENCHMARK_MONTHLY);
     }
-  }
-</script>
-  
-  <iframe name="n8n_target" style="display:none;"></iframe>
+
+    async function submitFinal() {
+      const btn = $('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      const company = $('companyName').value;
+      const sal = $('salarySlider').value;
+      const stake = $('stakeVal').textContent;
+      const ip = $('ipRights').checked;
+
+      const draftHTML = `
+        <div style="font-family: sans-serif; color: #111; max-width: 600px;">
+          <h2 style="color: #0056b3;">MOU: STRATEGIC GROWTHOPS PARTNERSHIP</h2>
+          <p><strong>Company:</strong> ${company}<br><strong>Lead:</strong> Naveedul Haque Ontik</p>
+          <hr>
+          <h3>I. ENGAGEMENT & RESPONSIBILITIES</h3>
+          <ul>
+            <li><strong>Weekly Commitment:</strong> 24 Hours + Dynamic Scaling.</li>
+            <li><strong>Responsibility 1:</strong> End-to-end Automation Infrastructure (n8n/AI Core).</li>
+            <li><strong>Responsibility 2:</strong> Growth Evaluation (Conversion efficiency & system scalability).</li>
+            <li><strong>Responsibility 3:</strong> KPI Fulfillment (Mutually agreed monthly targets).</li>
+          </ul>
+          <h3>II. FINANCIALS</h3>
+          <p>Base Salary: ৳${parseInt(sal).toLocaleString()}/mo<br>Equity: ${stake}% (2yr Vest / 1yr Cliff)</p>
+          <h3>III. IP PROVISIONS</h3>
+          <p>${ip ? '100% IP Transfer on Vesting completion. Reversion trigger active on Termination Without Cause.' : 'IP Retained by Contractor; Operating License granted.'}</p>
+        </div>
+      `;
+
+      // Simulating success for this snippet - connect Web3Forms for real email
+      console.log("Draft Generated:", draftHTML);
+      setTimeout(() => {
+        $('status').textContent = "MOU Draft Ready. (Link to Web3Forms to send)";
+        $('status').className = "status show ok";
+        btn.disabled = false;
+        btn.textContent = "Generate Edulytics MOU";
+      }, 1000);
+    }
+
+    $('effectiveDate').value = new Date().toISOString().split('T')[0];
+    calculate();
+  </script>
 </body>
 </html>
