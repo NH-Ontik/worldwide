@@ -331,126 +331,171 @@
     }
 
     async function submitFinal() {
-      const btn = $('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Generating MOU...';
+  const btn = $('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating MOU...';
 
-      const company = $('companyName').value || '[Company Name]';
-      const date = $('effectiveDate').value || new Date().toISOString().split('T')[0];
-      const sal = parseInt($('salarySlider').value);
-      const stake = $('stakeVal').textContent;
-      const ip = $('ipRights').checked;
-      const vest = $('vestingYears').value;
-      const cliff = $('cliffMonths').value;
-      const effVal = $('totalValue').textContent;
-      const riskAdj = $('adjustedStake').textContent;
+  const company = $('companyName').value || '[Company Name]';
+  const date = $('effectiveDate').value || new Date().toISOString().split('T')[0];
+  const sal = parseInt($('salarySlider').value);
+  const stake = $('stakeVal').textContent;
+  const ip = $('ipRights').checked;
+  const vest = $('vestingYears').value;
+  const cliff = $('cliffMonths').value;
+  const effVal = $('totalValue').textContent;
+  const riskAdj = $('adjustedStake').textContent;
+  const forgone = $('forgone').textContent;
+  const rawEq = $('rawStake').textContent;
 
-      // Build Professional HTML MOU Draft
-      const draftHTML = `
-        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; color: #111; line-height: 1.6;">
-          <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">BINDING MEMORANDUM OF UNDERSTANDING</h2>
-          <p><strong>Employment Agreement Addendum | GrowthOps Engineer</strong></p>
-          <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-          
-          <h3>I. PARTIES AND ROLE DEFINITION</h3>
-          <ul>
-            <li><strong>Company:</strong> ${company}</li>
-            <li><strong>Contractor:</strong> Naveedul Haque Ontik</li>
-            <li><strong>Effective Date:</strong> ${date}</li>
-            <li><strong>Role:</strong> GrowthOps Engineer & Technical Growth Architect</li>
-            <li><strong>Direct Focus:</strong> Advanced RAG System Implementation, n8n Workflow Orchestration, and Sovereign AI Infrastructure Management.</li>
-          </ul>
+  // Professional plain-text MOU (renders perfectly in ALL email clients)
+  const mouText = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 BINDING MEMORANDUM OF UNDERSTANDING
+   Employment Agreement Addendum
+   GrowthOps Engineer
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-          <h3>II. OPERATIONAL SCHEDULE & RESPONSIBILITIES</h3>
-          <p>To maintain 100% documentation accuracy and balance academic commitments at BUP, the following schedule is established:</p>
-          <ul>
-            <li><strong>Weekly Commitment:</strong> 24 Hours per week (with need-basis adjustments)</li>
-            <li><strong>On-Site (Collaboration/Strategy):</strong> Flexible / As needed</li>
-            <li><strong>Remote (Deep-Work/Automation):</strong> Flexible / As needed</li>
-            <li><strong>Rest/Academic Focus:</strong> Flexible / As needed</li>
-          </ul>
-          <p><strong>Key Responsibilities:</strong></p>
-          <ol>
-            <li><strong>Infrastructure:</strong> Maintenance of LiteLLM API gateway, PostgreSQL logging, and NVMe/HDD tiered storage systems.</li>
-            <li><strong>Automation:</strong> Development of n8n workflows for sales orchestration and internal administrative efficiency.</li>
-            <li><strong>Documentation:</strong> 100% accuracy in CRM (Zoho) operations and process documentation.</li>
-          </ol>
+I. PARTIES AND ROLE DEFINITION
+──────────────────────────────
+• Company:      ${company}
+• Contractor:   Naveedul Haque Ontik
+• Effective:    ${date}
+• Role:         GrowthOps Engineer & Technical Growth Architect
+• Focus:        Advanced RAG System Implementation, 
+                n8n Workflow Orchestration, 
+                Sovereign AI Infrastructure Management
 
-          <h3>III. COMPENSATION & EQUITY (THE EQUITY BUYOUT MODEL)</h3>
-          <p>The compensation structure is based on a <strong>Market Benchmark of ৳1,00,000/month</strong>. The Contractor is "investing" the difference into the company's valuation.</p>
-          <h4>1. Cash Compensation</h4>
-          <ul>
-            <li><strong>Initial Base Salary:</strong> ৳${fmt(sal)} per month.</li>
-            <li><strong>Annual Cash:</strong> ৳${fmt(sal * 12)}</li>
-            <li><strong>Market Benchmark:</strong> ৳1,200,000/yr</li>
-          </ul>
-          <h4>2. Equity Stake & Vesting</h4>
-          <ul>
-            <li><strong>Proposed Equity Stake:</strong> <strong>${stake}%</strong> in ${company}</li>
-            <li><strong>Raw Equity Calculation:</strong> (Salary Forgone ÷ Valuation) + IP Premium</li>
-            <li><strong>Risk-Adjusted Equity:</strong> ${riskAdj}% (accounts for illiquidity & dilution)</li>
-            <li><strong>Vesting Schedule:</strong> ${vest} years total duration</li>
-            <li><strong>The Cliff:</strong> ${cliff}-Month Cliff. On the cliff anniversary, 50% of total equity vests immediately. The remainder vests monthly thereafter.</li>
-          </ul>
+II. OPERATIONAL SCHEDULE
+──────────────────────────────
+• Weekly Commitment: 24 Hours (with need-basis adjustments)
+• On-Site:           Flexible / As needed
+• Remote:            Flexible / As needed  
+• Academic Focus:    Flexible / As needed
 
-          <h3>IV. INTELLECTUAL PROPERTY (IP) & SECURITY</h3>
-          <h4>1. Assignment of Rights</h4>
-          <p>${ip 
-            ? 'The Contractor agrees to transfer <strong>100% Intellectual Property ownership</strong> of all technical logic and n8n blueprints created for the Company, <em>contingent upon the completion of the vesting period</em>.' 
-            : 'The Contractor retains background IP; a non-exclusive operational license is granted to the Company for the duration of the agreement.'}
-          </p>
-          <h4>2. "Good Leaver" Protection</h4>
-          <p>In the event of <strong>Termination Without Cause</strong>:</p>
-          <ul>
-            <li><strong>Accelerated Vesting:</strong> The Contractor shall immediately vest in the next milestone.</li>
-            <li><strong>IP Reversion:</strong> If terminated before the full vesting mark, the IP transfer reverts to a <strong>Non-Exclusive License</strong>. The Contractor regains ownership of the underlying logic, while the Company maintains the right to use current systems.</li>
-          </ul>
-          <h4>3. Professional Toolkit</h4>
-          <p>The Contractor retains the right to maintain offline JSON backups of workflow architectures (empty of company data) for personal portfolio use and technical case studies.</p>
+Key Responsibilities:
+  1. Orchestration & Workflow Logic: Design and maintenance of a central automation layer to synchronize cross-departmental data, eliminating manual entry and ensuring 100% documentation accuracy.
 
-          <h3>V. EFFECTIVE ANNUAL VALUE SUMMARY</h3>
-          <p style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #0056b3;">
-            • Annual Salary Forgone: ৳${fmt(BENCHMARK_ANNUAL - (sal * 12))}<br>
-            • Raw Equity Stake: ${$('rawStake').textContent}%<br>
-            • Risk-Adjusted Equity: ${riskAdj}%<br>
-            • <strong>Total Effective Annual Value: ৳${effVal}</strong><br>
-            <em style="font-size: 0.9em; color: #555;">(Cash + Annualized Realistic Equity Value over ${vest}-year vesting)</em>
-          </p>
+2. Growth Engineering & Optimization: Evaluating the technical conversion funnel to identify friction points and implementing automated triggers to improve lead-to-customer velocity.
 
-          <h3>VI. SIGNATURES</h3>
-          <table style="width:100%; border-collapse: collapse; margin-top: 15px; font-family: 'Courier New', monospace;">
-            <tr>
-              <td style="padding: 15px; border: 1px solid #ccc; width: 50%; vertical-align: top;">
-                <strong>Company Representative</strong><br>
-                Title: CEO / Founder<br><br>
-                Signature: ___________________<br>
-                Date: _______________
-              </td>
-              <td style="padding: 15px; border: 1px solid #ccc; width: 50%; vertical-align: top;">
-                <strong>Naveedul Haque Ontik</strong><br>
-                Title: GrowthOps Engineer<br><br>
-                Signature: ___________________<br>
-                Date: _______________
-              </td>
-            </tr>
-          </table>
+3. Intelligence Integration Layer: Deploying secure middleware to leverage Large Language Models for automated customer research, lead scoring, and content synthesis.
 
-          <hr style="border:0; border-top:2px dashed #999; margin:25px 0;">
-          <h3>📋 INTERNAL RECORD STICKY NOTE</h3>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0056b3; font-family: monospace; font-size: 14px;">
-            <strong>Deal Summary:</strong><br>
-            • Cash: ৳${fmt(sal)}/mo (৳${fmt(sal*12)}/yr)<br>
-            • Equity: ${stake}% (${vest}yr Vest / ${cliff}mo Cliff)<br>
-            • IP: ${ip ? '100% Transfer to Company (Vested) | Reversion Trigger Active' : 'Non-Exclusive License'}<br>
-            • Schedule: 24 hrs/week (Need Basis)<br>
-            • Infrastructure: Sovereign AI Stack + n8n Orchestration<br>
-            • Effective Annual Value: ৳${effVal}
-          </div>
-          <p style="font-size: 11px; color: #666; margin-top: 15px; font-style: italic;">
-            Disclaimer: This document serves as a binding MOU framework. Final execution requires formal legal review and incorporation into the primary employment/shareholders agreement. Not legal or tax advice.
-          </p>
-        </div>
-      `;
+4. Dynamic Data Infrastructure: Managing scalable database environments to track real-time KPI performance and maintain confidential operational records.
+
+5. Strategic KPI Fulfillment: Executing on realistic, data-backed targets agreed upon by both parties to ensure the infrastructure directly contributes to revenue scaling.
+
+III. COMPENSATION & EQUITY
+──────────────────────────────
+Market Benchmark: ৳1,00,000/month (৳1,200,000/yr)
+
+💰 Cash Compensation:
+   • Base Salary:   ৳${fmt(sal)}/month
+   • Annual Cash:   ৳${fmt(sal * 12)}
+   • Growth Path:   Guaranteed increment to ৳55,000/mo by Month 24
+
+📈 Equity Stake & Vesting:
+   • Proposed Stake:    ${stake}% in ${company}
+   • Raw Calculation:   (Salary Forgone ÷ Valuation) + IP Premium
+   • Risk-Adjusted:     ${riskAdj}% (illiquidity & dilution accounted)
+   • Vesting Period:    ${vest} years
+   • Cliff Period:      ${cliff} months
+     → On cliff anniversary: 50% vests immediately
+     → Remainder vests monthly thereafter
+
+IV. INTELLECTUAL PROPERTY (IP) & SECURITY
+──────────────────────────────
+${ip 
+  ? `✅ IP ASSIGNMENT (Vested):
+   • Contractor transfers 100% IP ownership of all technical 
+     logic and n8n blueprints to Company, contingent upon 
+     completion of the ${vest}-year vesting period.`
+  : `⬜ IP LICENSE (Non-Exclusive):
+   • Contractor retains background IP ownership.
+   • Company granted non-exclusive operational license 
+     for duration of agreement.`}
+
+🛡️ "Good Leaver" Protection:
+   In event of Termination Without Cause:
+   • Accelerated Vesting: Next milestone vests immediately
+   • IP Reversion: If terminated before full vesting, 
+     IP transfer reverts to Non-Exclusive License. 
+     Contractor regains underlying logic ownership; 
+     Company retains right to use current systems.
+
+🧰 Professional Toolkit:
+   Contractor may maintain offline JSON backups of workflow 
+   architectures (empty of company data) for personal 
+   portfolio use and technical case studies.
+
+V. EFFECTIVE ANNUAL VALUE SUMMARY
+──────────────────────────────
+┌─────────────────────────────────┐
+│ • Annual Salary Forgone:  ৳${forgone}
+│ • Raw Equity Stake:       ${rawEq}%
+│ • Risk-Adjusted Equity:   ${riskAdj}%
+│ • TOTAL EFFECTIVE VALUE:  ৳${effVal}
+│   (Cash + Annualized Realistic Equity 
+│    over ${vest}-year vesting)
+└─────────────────────────────────┘
+
+VI. SIGNATURES
+──────────────────────────────
+Company Representative          Naveedul Haque Ontik
+Title: CEO / Founder            Title: GrowthOps Engineer
+
+Signature: _______________      Signature: _______________
+Date:      _______________      Date:      _______________
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 INTERNAL RECORD STICKY NOTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Deal Summary:
+• Cash:    ৳${fmt(sal)}/mo (৳${fmt(sal*12)}/yr)
+• Equity:  ${stake}% (${vest}yr Vest / ${cliff}mo Cliff)
+• IP:      ${ip ? '100% Transfer (Vested) | Reversion Active' : 'Non-Exclusive License'}
+• Schedule:24 hrs/week (Need Basis)
+• Stack:   Sovereign AI + n8n Orchestration
+• Value:   ৳${effVal}/yr Effective Annual Value
+
+⚠️ Disclaimer: This document serves as a binding MOU framework. 
+Final execution requires formal legal review and incorporation 
+into the primary employment/shareholders agreement. 
+Not legal or tax advice. All figures in BDT.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  `.trim();
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        subject: `📄 MOU Draft: ${company} x Naveedul Haque Ontik`,
+        from_name: 'GrowthOps Dashboard',
+        // Send ONLY plain text — no HTML field needed
+        message: mouText
+      })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      btn.textContent = '✓ MOU Sent to Email';
+      btn.style.background = '#2ea043';
+      status('Check inbox. Draft is ready to sign.', true);
+    } else {
+      throw new Error(data.message || 'Submission failed');
+    }
+  } catch (e) {
+    console.error(e);
+    btn.textContent = '✗ Failed';
+    status('Check Web3Forms key or connection', false);
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Generate & Email MOU';
+      btn.style.background = '';
+    }, 3000);
+  }
+}
 
       try {
         const res = await fetch(WEB3FORMS_URL, {
