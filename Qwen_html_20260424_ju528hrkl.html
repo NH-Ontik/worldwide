@@ -268,7 +268,7 @@
   <script>
     const BENCHMARK_MONTHLY = 100000;
     const BENCHMARK_ANNUAL = BENCHMARK_MONTHLY * 12;
-    const WEB3FORMS_KEY = '558547d3-d69d-4cce-8c1e-6f2b9356b249'; // ← PASTE YOUR KEY FROM https://web3forms.com
+    const WEB3FORMS_KEY = '558547d3-d69d-4cce-8c1e-6f2b9356b249';
     const WEB3FORMS_URL = 'https://api.web3forms.com/submit';
 
     const fmt = n => Math.round(n).toLocaleString('en-BD');
@@ -331,24 +331,24 @@
     }
 
     async function submitFinal() {
-  const btn = $('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Generating MOU...';
+      const btn = $('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating MOU...';
 
-  const company = $('companyName').value || '[Company Name]';
-  const date = $('effectiveDate').value || new Date().toISOString().split('T')[0];
-  const sal = parseInt($('salarySlider').value);
-  const stake = $('stakeVal').textContent;
-  const ip = $('ipRights').checked;
-  const vest = $('vestingYears').value;
-  const cliff = $('cliffMonths').value;
-  const effVal = $('totalValue').textContent;
-  const riskAdj = $('adjustedStake').textContent;
-  const forgone = $('forgone').textContent;
-  const rawEq = $('rawStake').textContent;
+      const company = $('companyName').value || '[Company Name]';
+      const date = $('effectiveDate').value || new Date().toISOString().split('T')[0];
+      const sal = parseInt($('salarySlider').value);
+      const stake = $('stakeVal').textContent;
+      const ip = $('ipRights').checked;
+      const vest = $('vestingYears').value;
+      const cliff = $('cliffMonths').value;
+      const effVal = $('totalValue').textContent;
+      const riskAdj = $('adjustedStake').textContent;
+      const forgone = $('forgone').textContent;
+      const rawEq = $('rawStake').textContent;
 
-  // Professional plain-text MOU (renders perfectly in ALL email clients)
-  const mouText = `
+      // Professional plain-text MOU (renders perfectly in ALL email clients)
+      const mouText = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📄 BINDING MEMORANDUM OF UNDERSTANDING
    Employment Agreement Addendum
@@ -375,13 +375,13 @@ II. OPERATIONAL SCHEDULE
 Key Responsibilities:
   1. Orchestration & Workflow Logic: Design and maintenance of a central automation layer to synchronize cross-departmental data, eliminating manual entry and ensuring 100% documentation accuracy.
 
-2. Growth Engineering & Optimization: Evaluating the technical conversion funnel to identify friction points and implementing automated triggers to improve lead-to-customer velocity.
+  2. Growth Engineering & Optimization: Evaluating the technical conversion funnel to identify friction points and implementing automated triggers to improve lead-to-customer velocity.
 
-3. Intelligence Integration Layer: Deploying secure middleware to leverage Large Language Models for automated customer research, lead scoring, and content synthesis.
+  3. Intelligence Integration Layer: Deploying secure middleware to leverage Large Language Models for automated customer research, lead scoring, and content synthesis.
 
-4. Dynamic Data Infrastructure: Managing scalable database environments to track real-time KPI performance and maintain confidential operational records.
+  4. Dynamic Data Infrastructure: Managing scalable database environments to track real-time KPI performance and maintain confidential operational records.
 
-5. Strategic KPI Fulfillment: Executing on realistic, data-backed targets agreed upon by both parties to ensure the infrastructure directly contributes to revenue scaling.
+  5. Strategic KPI Fulfillment: Executing on realistic, data-backed targets agreed upon by both parties to ensure the infrastructure directly contributes to revenue scaling.
 
 III. COMPENSATION & EQUITY
 ──────────────────────────────
@@ -461,41 +461,7 @@ Final execution requires formal legal review and incorporation
 into the primary employment/shareholders agreement. 
 Not legal or tax advice. All figures in BDT.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  `.trim();
-
-  try {
-    const res = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        access_key: WEB3FORMS_KEY,
-        subject: `📄 MOU Draft: ${company} x Naveedul Haque Ontik`,
-        from_name: 'GrowthOps Dashboard',
-        // Send ONLY plain text — no HTML field needed
-        message: mouText
-      })
-    });
-    const data = await res.json();
-    
-    if (data.success) {
-      btn.textContent = '✓ MOU Sent to Email';
-      btn.style.background = '#2ea043';
-      status('Check inbox. Draft is ready to sign.', true);
-    } else {
-      throw new Error(data.message || 'Submission failed');
-    }
-  } catch (e) {
-    console.error(e);
-    btn.textContent = '✗ Failed';
-    status('Check Web3Forms key or connection', false);
-  } finally {
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = 'Generate & Email MOU';
-      btn.style.background = '';
-    }, 3000);
-  }
-}
+      `.trim();
 
       try {
         const res = await fetch(WEB3FORMS_URL, {
@@ -503,11 +469,9 @@ Not legal or tax advice. All figures in BDT.
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             access_key: WEB3FORMS_KEY,
-            is_html: true,
-            subject: `📄 Binding MOU Draft: ${company} x Naveedul Haque Ontik`,
+            subject: `📄 MOU Draft: ${company} x Naveedul Haque Ontik`,
             from_name: 'GrowthOps Dashboard',
-            message: draftHTML,
-            message_text: `BINDING MOU DRAFT\n\nCompany: ${company}\nContractor: Naveedul Haque Ontik\nEffective: ${date}\nSalary: ৳${fmt(sal)}/mo (৳${fmt(sal*12)}/yr)\nEquity: ${stake}% (Raw) / ${riskAdj}% (Risk-Adjusted)\nVesting: ${vest}yr / ${cliff}mo Cliff\nIP: ${ip?'100% Transfer (Vested)':'Non-Exclusive License'}\nEffective Annual Value: ৳${effVal}\n\nSignatures required.\n\nDisclaimer: Framework only - requires formal legal review.`
+            message: mouText
           })
         });
         const data = await res.json();
