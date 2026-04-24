@@ -259,8 +259,8 @@
   <script>
     const BENCHMARK_MONTHLY = 100000;
     const BENCHMARK_ANNUAL = BENCHMARK_MONTHLY * 12;
-    const FINALIZE_WEBHOOK = 'https://n8n.srv1607188.hstgr.cloud/webhook/negotiation-finalize';
-
+    const FINALIZE_WEBHOOK = 'https://corsproxy.io/?' + encodeURIComponent('https://n8n.srv1607188.hstgr.cloud/webhook/negotiation-finalize');
+    
     const fmt = n => Math.round(n).toLocaleString('en-BD');
     const $ = id => document.getElementById(id);
     const status = (msg, ok) => {
