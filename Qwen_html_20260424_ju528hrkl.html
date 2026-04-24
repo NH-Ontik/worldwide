@@ -257,135 +257,119 @@
   </div>
 
   <script>
-    const BENCHMARK_MONTHLY = 100000;
-    const BENCHMARK_ANNUAL = BENCHMARK_MONTHLY * 12;
-    const FINALIZE_WEBHOOK = 'https://corsproxy.io/?' + encodeURIComponent('https://n8n.srv1607188.hstgr.cloud/webhook/negotiation-finalize');
-    
-    const fmt = n => Math.round(n).toLocaleString('en-BD');
-    const $ = id => document.getElementById(id);
-    const status = (msg, ok) => {
-      const el = $('status');
-      el.textContent = msg;
-      el.className = 'status show ' + (ok ? 'ok' : 'err');
-      setTimeout(() => { el.className = 'status'; }, 2500);
-    };
+  const BENCHMARK_MONTHLY = 100000;
+  const BENCHMARK_ANNUAL = BENCHMARK_MONTHLY * 12;
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const p = new URLSearchParams(window.location.search);
-      $('revenue').value = p.get('revenue') || '';
-      $('valuation').value = p.get('valuation') || '';
-      $('salarySlider').value = p.get('salary') || 35000;
-      $('stakeSlider').value = p.get('stake') || 15;
-      $('ipRights').checked = p.get('ip') === 'true';
-      calculate();
-    });
-
-    function calculate() {
-      const val = parseFloat($('valuation').value) || 1;
-      const sal = parseInt($('salarySlider').value);
-      const ip = $('ipRights').checked ? 5 : 0;
-      const risk = parseFloat($('riskDiscount').value) / 100;
-      const dil = parseFloat($('dilutionBuffer').value) / 100;
-      const vest = parseFloat($('vestingYears').value) || 4;
-
-      const gap = BENCHMARK_ANNUAL - (sal * 12);
-      let raw = (gap / val) * 100 + ip;
-      raw = Math.max(0.1, Math.min(25, raw));
-      let adj = raw * (1 - risk) * (1 - dil);
-      adj = Math.max(0, adj);
-
-      const eqVal = (adj / 100) * val;
-      const total = (sal * 12) + (eqVal / vest);
-
-      $('salaryVal').textContent = fmt(sal);
-      $('stakeVal').textContent = raw.toFixed(1);
-      $('forgone').textContent = fmt(gap);
-      $('rawStake').textContent = raw.toFixed(1);
-      $('adjustedStake').textContent = adj.toFixed(1);
-      $('totalValue').textContent = fmt(total);
-      $('vestingSummary').textContent = `${vest} yr${vest>1?'s':''} w/ ${$('cliffMonths').value}-mo cliff`;
-      $('stakeSlider').value = raw;
-    }
-
-    function updateFromSalary() { calculate(); }
-    function updateFromStake() {
-      const val = parseFloat($('valuation').value) || 1;
-      const target = parseFloat($('stakeSlider').value);
-      const ip = $('ipRights').checked ? 5 : 0;
-      const gap = ((target - ip) / 100) * val;
-      let sal = BENCHMARK_MONTHLY - (gap / 12);
-      sal = Math.max(35000, Math.min(100000, sal));
-      $('salarySlider').value = sal;
-      calculate();
-      $('stakeVal').textContent = target.toFixed(1);
-    }
-
-    async function submitFinal() {
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  const payload = {
-    timestamp: new Date().toISOString(),
-    revenue: document.getElementById('revenue').value,
-    valuation: document.getElementById('valuation').value,
-    salary: document.getElementById('salarySlider').value,
-    stake: document.getElementById('stakeSlider').value,
-    ipRights: document.getElementById('ipRights').checked,
-    riskDiscount: document.getElementById('riskDiscount').value,
-    vestingYears: document.getElementById('vestingYears').value,
-    cliffMonths: document.getElementById('cliffMonths').value,
-    dilutionBuffer: document.getElementById('dilutionBuffer').value,
-    effectiveValue: document.getElementById('totalValue').textContent
+  const fmt = n => Math.round(n).toLocaleString('en-BD');
+  const $ = id => document.getElementById(id);
+  const status = (msg, ok) => {
+    const el = $('status');
+    el.textContent = msg;
+    el.className = 'status show ' + (ok ? 'ok' : 'err');
+    setTimeout(() => { el.className = 'status'; }, 2500);
   };
 
-  // CORS-proof form submission
-  const form = document.createElement('form');
-  form.action = 'https://n8n.srv1607188.hstgr.cloud/webhook/negotiation-finalize';
-  form.method = 'POST';
-  form.target = 'n8n_target';
-  form.style.display = 'none';
+  window.addEventListener('DOMContentLoaded', () => {
+    const p = new URLSearchParams(window.location.search);
+    $('revenue').value = p.get('revenue') || '';
+    $('valuation').value = p.get('valuation') || '';
+    $('salarySlider').value = p.get('salary') || 35000;
+    $('stakeSlider').value = p.get('stake') || 15;
+    $('ipRights').checked = p.get('ip') === 'true';
+    calculate();
+  });
 
-  for (const [key, value] of Object.entries(payload)) {
-    const input = document.createElement('input');
-    input.name = key;
-    input.value = value;
-    form.appendChild(input);
+  function calculate() {
+    const val = parseFloat($('valuation').value) || 1;
+    const sal = parseInt($('salarySlider').value);
+    const ip = $('ipRights').checked ? 5 : 0;
+    const risk = parseFloat($('riskDiscount').value) / 100;
+    const dil = parseFloat($('dilutionBuffer').value) / 100;
+    const vest = parseFloat($('vestingYears').value) || 4;
+
+    const gap = BENCHMARK_ANNUAL - (sal * 12);
+    let raw = (gap / val) * 100 + ip;
+    raw = Math.max(0.1, Math.min(25, raw));
+    let adj = raw * (1 - risk) * (1 - dil);
+    adj = Math.max(0, adj);
+
+    const eqVal = (adj / 100) * val;
+    const total = (sal * 12) + (eqVal / vest);
+
+    $('salaryVal').textContent = fmt(sal);
+    $('stakeVal').textContent = raw.toFixed(1);
+    $('forgone').textContent = fmt(gap);
+    $('rawStake').textContent = raw.toFixed(1);
+    $('adjustedStake').textContent = adj.toFixed(1);
+    $('totalValue').textContent = fmt(total);
+    $('stakeSlider').value = raw;
   }
 
-  document.body.appendChild(form);
-  form.submit();
+  function updateFromSalary() { calculate(); }
+  function updateFromStake() {
+    const val = parseFloat($('valuation').value) || 1;
+    const target = parseFloat($('stakeSlider').value);
+    const ip = $('ipRights').checked ? 5 : 0;
+    const gap = ((target - ip) / 100) * val;
+    let sal = BENCHMARK_MONTHLY - (gap / 12);
+    sal = Math.max(35000, Math.min(100000, sal));
+    $('salarySlider').value = sal;
+    calculate();
+    $('stakeVal').textContent = target.toFixed(1);
+  }
 
-  setTimeout(() => {
-    btn.textContent = '✓ Sent Successfully';
-    btn.style.background = '#2ea043';
-    btn.style.color = '#fff';
-  }, 1000);
-};
+  async function submitFinal() {
+    const btn = $('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
 
-      try {
-        const res = await fetch(FINALIZE_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-          status('✓ Saved to n8n — Terms recorded', true);
-          btn.textContent = '✓ Submitted';
-        } else {
-          status('✗ Server error — try again', false);
-          btn.textContent = 'Retry';
-        }
-      } catch (e) {
-        console.error(e);
-        status('✗ Network error — check connection/CORS', false);
-        btn.textContent = 'Retry';
-      } finally {
-        setTimeout(() => { btn.disabled = false; btn.textContent = 'Submit Final Terms'; }, 2500);
+    const payload = {
+      revenue: $('revenue').value,
+      valuation: $('valuation').value,
+      salary: $('salarySlider').value,
+      stake: $('stakeSlider').value,
+      ipRights: $('ipRights').checked,
+      riskDiscount: $('riskDiscount').value,
+      vestingYears: $('vestingYears').value,
+      cliffMonths: $('cliffMonths').value,
+      dilutionBuffer: $('dilutionBuffer').value,
+      effectiveValue: $('totalValue').textContent,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/naveedulhaque2004@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _subject: '🤝 New Negotiation Submitted',
+          _template: 'table',
+          _captcha: 'false',
+          ...payload
+        })
+      });
+
+      if (res.ok) {
+        btn.textContent = '✓ Sent to Email';
+        btn.style.background = '#2ea043';
+        status('Check your inbox for confirmation', true);
+      } else {
+        throw new Error('FormSubmit error');
       }
+    } catch (e) {
+      console.error(e);
+      btn.textContent = '✗ Failed';
+      status('Try again or email manually', false);
+    } finally {
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = 'Submit Final Terms';
+        btn.style.background = '';
+      }, 3000);
     }
-  </script>
+  }
+</script>
+  
   <iframe name="n8n_target" style="display:none;"></iframe>
 </body>
 </html>
